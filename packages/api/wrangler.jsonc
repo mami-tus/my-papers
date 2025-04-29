@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "api",
   "main": "src/index.ts",
-  "compatibility_date": "2025-04-28"
+  "compatibility_date": "2025-04-28",
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
@@ -21,13 +21,13 @@
   //     "bucket_name": "my-bucket"
   //   }
   // ],
-  // "d1_databases": [
-  //   {
-  //     "binding": "MY_DB",
-  //     "database_name": "my-database",
-  //     "database_id": ""
-  //   }
-  // ],
+  "d1_databases": [
+    {
+      "binding": "MY_DB", // この行は通常変更不要
+      "database_name": "my-papers-db",
+      "database_id": "4accbecb-45b0-4014-9e20-531e29dbda61" // wrangler d1 create my-papers-db で取得したID
+    }
+  ],
   // "ai": {
   //   "binding": "AI"
   // },
