@@ -1,5 +1,8 @@
 {
   "name": "my-papers",
+  "workspaces": [
+    "packages/*"
+  ],
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
