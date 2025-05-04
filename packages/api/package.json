@@ -3,7 +3,12 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply my-papers-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply my-papers-db --remote",
+    "db:migrate": "pnpm run db:migrate:local && pnpm run db:migrate:remote",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "drizzle-orm": "^0.43.1",

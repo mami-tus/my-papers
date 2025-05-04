@@ -25,8 +25,7 @@
     {
       "binding": "DB",
       "database_name": "my-papers-db",
-      "database_id": "875186ee-764e-4819-b4cf-92967a8f3c0a",
-      "migrations_dir": "drizzle"
+      "database_id": "e5bd2768-bc97-4d65-b209-e2b1ddd5d607"
     }
   ]
   // "ai": {
