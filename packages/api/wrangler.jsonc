@@ -3,9 +3,9 @@
   "name": "api",
   "main": "src/index.ts",
   "compatibility_date": "2025-05-04",
-  // "compatibility_flags": [
-  //   "nodejs_compat"
-  // ],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },
@@ -25,7 +25,8 @@
     {
       "binding": "DB",
       "database_name": "my-papers-db",
-      "database_id": "875186ee-764e-4819-b4cf-92967a8f3c0a"
+      "database_id": "875186ee-764e-4819-b4cf-92967a8f3c0a",
+      "migrations_dir": "drizzle"
     }
   ]
   // "ai": {
