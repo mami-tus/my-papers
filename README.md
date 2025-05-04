@@ -11,3 +11,15 @@
 - 研究者や学生が読んだ論文を視覚的に一つの本のように分野ごとに表示でき、その論文間の関係を確認したり、自身の考察も記入できるようにする
 - 自身が追加した論文から生成 AI に候補論文を提案してもらう
 - 追加した論文のみからこれまでの流れや現在の課題などをまとめてもらう
+
+## 技術スタック
+
+- **言語:** TypeScript
+- **ランタイム:** Node.js
+- **パッケージマネージャー:** pnpm
+- **フロントエンド:** React, Vite, Tailwind CSS
+- **バックエンド:** Hono (on Cloudflare Workers)
+- **データベース:** Cloudflare D1
+- **ORM:** Drizzle ORM
+- **コード品質:** Biome
+- **デプロイ/ホスティング:** Cloudflare Pages, Cloudflare Workers
