@@ -8,7 +8,8 @@
     "db:migrate:local": "wrangler d1 migrations apply my-papers-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply my-papers-db --remote",
     "db:migrate": "pnpm run db:migrate:local && pnpm run db:migrate:remote",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:reset:local": "wrangler d1 execute my-papers-db --local --command=\"DROP TABLE IF EXISTS papers; DROP TABLE IF EXISTS fields; DROP TABLE IF EXISTS users; DROP TABLE IF EXISTS d1_migrations;\""
   },
   "dependencies": {
     "drizzle-orm": "^0.43.1",
