@@ -19,10 +19,23 @@ const timestamps = {
 
 export const users = sqliteTable('users', {
   // システムを拡張したりする段階で 、 必要に応じてULIDへの変更を検討する
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  name: text('name').notNull(),
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
   ...timestamps,
 });
+
+export const fields = sqliteTable(
+  'fields',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    userId: integer()
+      .notNull()
+      .references(() => users.id),
+    name: text().notNull(),
+    ...timestamps,
+  },
+  (table) => [unique().on(table.userId, table.name)]
+);
 
 export const papers = sqliteTable(
   'papers',
@@ -31,14 +44,14 @@ export const papers = sqliteTable(
     userId: integer()
       .notNull()
       .references(() => users.id),
-    field: text().notNull(),
+    fieldId: integer()
+      .notNull()
+      .references(() => fields.id),
     doi: text().notNull(),
     title: text().notNull(),
     year: integer().notNull(),
     authors: blob({ mode: 'json' }).$type<string[]>(),
     ...timestamps,
   },
-  (table) => [
-    unique('unique_user_field_doi').on(table.userId, table.field, table.doi),
-  ]
+  (table) => [unique().on(table.userId, table.fieldId, table.doi)]
 );
