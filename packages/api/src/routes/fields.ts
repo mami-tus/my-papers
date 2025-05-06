@@ -6,6 +6,7 @@ import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { eq, and } from 'drizzle-orm';
 import { createDbClient } from '../db/drizzle';
+import type { Variables } from '../middleware/auth';
 
 // DBスキーマとZodスキーマの連携
 const insertFieldSchema = createInsertSchema(fields, {
@@ -16,7 +17,10 @@ const insertFieldSchema = createInsertSchema(fields, {
 });
 const createFieldSchema = insertFieldSchema.pick({ name: true });
 
-const fieldsApp = new Hono<{ Bindings: CloudflareBindings }>();
+const fieldsApp = new Hono<{
+  Bindings: CloudflareBindings;
+  Variables: Variables;
+}>();
 
 // POST /api/fields - 新しい分野を登録
 fieldsApp.post('/', zValidator('json', createFieldSchema), async (c) => {
@@ -24,8 +28,7 @@ fieldsApp.post('/', zValidator('json', createFieldSchema), async (c) => {
     // バリデーション済みのリクエストボディを取得
     const { name } = c.req.valid('json');
 
-    // TODO: 認証ミドルウェアから取得する
-    const userId = 1; // 手動登録したデフォルトユーザーのID
+    const userId = c.get('userId');
 
     // DBインスタンスの取得
     const db = createDbClient(c.env.DB);
@@ -72,8 +75,7 @@ fieldsApp.post('/', zValidator('json', createFieldSchema), async (c) => {
 // GET /api/fields - ユーザーの分野一覧を取得
 fieldsApp.get('/', async (c) => {
   try {
-    // ユーザーID取得（認証実装後に変更）
-    const userId = 1; // 手動登録したデフォルトユーザーのID
+    const userId = c.get('userId');
 
     // DBインスタンスの取得
     const db = createDbClient(c.env.DB);
