@@ -4,7 +4,6 @@ import { fields } from '../db/schema';
 import { zValidator } from '@hono/zod-validator';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import type { Bindings } from '../index';
 import { eq, and } from 'drizzle-orm';
 import { createDbClient } from '../db/drizzle';
 
@@ -17,7 +16,7 @@ const insertFieldSchema = createInsertSchema(fields, {
 });
 const createFieldSchema = insertFieldSchema.pick({ name: true });
 
-const fieldsApp = new Hono<{ Bindings: Bindings }>();
+const fieldsApp = new Hono<{ Bindings: CloudflareBindings }>();
 
 // POST /api/fields - 新しい分野を登録
 fieldsApp.post('/', zValidator('json', createFieldSchema), async (c) => {
@@ -25,7 +24,7 @@ fieldsApp.post('/', zValidator('json', createFieldSchema), async (c) => {
     // バリデーション済みのリクエストボディを取得
     const { name } = c.req.valid('json');
 
-    // TODO: ユーザー登録
+    // TODO: 認証ミドルウェアから取得する
     const userId = 1; // 手動登録したデフォルトユーザーのID
 
     // DBインスタンスの取得
@@ -46,6 +45,7 @@ fieldsApp.post('/', zValidator('json', createFieldSchema), async (c) => {
     }
 
     // 新しい分野をDBに挿入
+    // トランザクションにする
     const newField = await db
       .insert(fields)
       .values({
@@ -73,10 +73,10 @@ fieldsApp.post('/', zValidator('json', createFieldSchema), async (c) => {
 fieldsApp.get('/', async (c) => {
   try {
     // ユーザーID取得（認証実装後に変更）
-    const userId = 1; // 仮のユーザーID
+    const userId = 1; // 手動登録したデフォルトユーザーのID
 
     // DBインスタンスの取得
-    const db = drizzle(c.env.DB);
+    const db = createDbClient(c.env.DB);
 
     // ユーザーの分野一覧を取得
     const userFields = await db
