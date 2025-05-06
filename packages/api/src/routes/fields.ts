@@ -1,5 +1,4 @@
 import { Hono } from 'hono';
-import { drizzle } from 'drizzle-orm/d1';
 import { fields, papers } from '../db/schema';
 import { zValidator } from '@hono/zod-validator';
 import { createInsertSchema } from 'drizzle-zod';
