@@ -1,10 +1,11 @@
 import { Hono } from 'hono';
 import { drizzle } from 'drizzle-orm/d1';
-import { papers, users } from './db/schema';
+import { papers, users, fields } from './db/schema';
 import { fetchPaperMetadata } from './lib/crossref';
 import { sql } from 'drizzle-orm';
+import apiRouter from './routes';
 
-type Bindings = {
+export type Bindings = {
   DB: D1Database;
 };
 
@@ -14,36 +15,18 @@ app.get('/', (c) => {
   return c.text('Hello Hono!');
 });
 
-app.get('/users', async (c) => {
+// 検証用
+app.get('/fields', async (c) => {
   const db = drizzle(c.env.DB);
-  const allUsers = await db.select().from(users).all();
-
-  return c.json(allUsers, 200);
+  const allFields = await db.select().from(fields).all();
+  console.log(allFields);
+  return c.json(allFields, 200);
 });
 
-// 論文情報を取得するエンドポイント
-app.get('/paper/:doi', async (c) => {
-  const doi = c.req.param('doi');
+// APIルートをマウント
+app.route('/api', apiRouter);
 
-  try {
-    const metadata = await fetchPaperMetadata(doi);
-    if (!metadata) {
-      return c.json({ error: '論文が見つかりませんでした' }, 404);
-    }
-    return c.json(metadata);
-  } catch (error) {
-    return c.json(
-      {
-        error: `論文の取得に失敗しました: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      },
-      500
-    );
-  }
-});
-
-// 論文を保存するエンドポイント
+// 論文を保存するエンドポイント - 後で/routes/papers.tsに移動予定
 app.post('/papers', async (c) => {
   const { doi, field } = await c.req.json();
 
@@ -82,7 +65,7 @@ app.post('/papers', async (c) => {
     }
 
     // 著者名の配列を作成
-    const authorNames = metadata.authors.map((author) => author.name);
+    const authorNames = metadata.authors;
 
     // DBに保存
     const newPaper = await db

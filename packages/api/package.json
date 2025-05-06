@@ -9,12 +9,16 @@
     "db:migrate:remote": "wrangler d1 migrations apply my-papers-db --remote",
     "db:migrate": "pnpm run db:migrate:local && pnpm run db:migrate:remote",
     "db:studio": "drizzle-kit studio",
+    "db:default:local": "wrangler d1 execute my-papers-db --local --command=\"INSERT INTO users (name) VALUES ('default_user');\"",
     "db:reset:local": "wrangler d1 execute my-papers-db --local --command=\"DROP TABLE IF EXISTS papers; DROP TABLE IF EXISTS fields; DROP TABLE IF EXISTS users; DROP TABLE IF EXISTS d1_migrations;\"",
     "test": "vitest"
   },
   "dependencies": {
+    "@hono/zod-validator": "^0.5.0",
     "drizzle-orm": "^0.43.1",
-    "hono": "^4.7.8"
+    "drizzle-zod": "^0.7.1",
+    "hono": "^4.7.8",
+    "zod": "^3.24.4"
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
