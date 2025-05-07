@@ -52,8 +52,8 @@ papersApp.post('/', zValidator('json', createPaperSchema), async (c) => {
         and(
           eq(papers.userId, userId),
           eq(papers.fieldId, fieldId),
-          eq(papers.doi, doi)
-        )
+          eq(papers.doi, doi),
+        ),
       )
       .get();
 
@@ -63,7 +63,7 @@ papersApp.post('/', zValidator('json', createPaperSchema), async (c) => {
           error: 'この論文は分野内で既に登録されています',
           paper: existingPaper,
         },
-        409
+        409,
       );
     }
 
@@ -93,7 +93,7 @@ papersApp.post('/', zValidator('json', createPaperSchema), async (c) => {
           error instanceof Error ? error.message : String(error)
         }`,
       },
-      500
+      500,
     );
   }
 });

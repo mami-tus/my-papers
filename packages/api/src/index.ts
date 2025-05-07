@@ -10,4 +10,7 @@ app.get('/', (c) => {
 // APIルートをマウント
 app.route('/api', apiRouter);
 
+// アプリケーション全体の型をエクスポート
+export type AppType = typeof app;
+
 export default app;
