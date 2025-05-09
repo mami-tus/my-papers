@@ -4,10 +4,10 @@ import papersApp from './papers';
 import { authMiddleware } from '../middleware/auth';
 
 // メインルーターの作成
-const apiRouter = new Hono().use('*', authMiddleware);
-
-// 各ルートを追加
-apiRouter.route('/fields', fieldsApp);
-apiRouter.route('/papers', papersApp);
+const apiRouter = new Hono()
+  .use(authMiddleware)
+  // 各ルートを追加
+  .route('/fields', fieldsApp)
+  .route('/papers', papersApp);
 
 export default apiRouter;
