@@ -1,6 +1,29 @@
-import { useState } from 'react';
-import { X } from 'lucide-react';
 import { useCreateField } from '../hooks/useCreateField';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+
+const formSchema = z.object({
+  name: z.string().min(1, 'Field name is required').max(100),
+});
 
 interface CreateFieldModalProps {
   isOpen: boolean;
@@ -8,87 +31,79 @@ interface CreateFieldModalProps {
 }
 
 export function CreateFieldModal({ isOpen, onClose }: CreateFieldModalProps) {
-  const [name, setName] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const { mutate, isPending } = useCreateField();
 
-  if (!isOpen) return null;
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) {
-      setError('Field name is required');
-      return;
-    }
+  function onSubmit(values: z.infer<typeof formSchema>) {
     mutate(
-      { name },
+      { name: values.name },
       {
         onSuccess: () => {
           onClose();
-          setName('');
-          setError(null);
+          form.reset();
         },
         onError: (err) => {
-          setError(
-            err instanceof Error ? err.message : 'An unexpected error occurred',
-          );
+          form.setError('name', {
+            message:
+              err instanceof Error
+                ? err.message
+                : 'An unexpected error occurred',
+          });
         },
       },
     );
-  };
+  }
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-card text-card-foreground rounded-lg p-6 w-full max-w-md shadow-lg border border-border">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Add New Field</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add New Field</DialogTitle>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="name" className="block text-sm font-medium mb-1">
-              Field Name *
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-md bg-background"
-              placeholder="e.g., Machine Learning"
-              maxLength={100}
+        <Form {...form}>
+          <div className="space-y-6">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Field Name *</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., Machine Learning"
+                      maxLength={100}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          {error && (
-            <div className="mb-4 text-destructive text-sm">{error}</div>
-          )}
-
-          <div className="flex justify-end gap-2 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-muted-foreground hover:text-foreground"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50"
-            >
-              {isPending ? 'Creating...' : 'Create'}
-            </button>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                type="submit"
+                disabled={isPending}
+                onClick={form.handleSubmit(onSubmit)}
+              >
+                {isPending ? 'Creating...' : 'Create'}
+              </Button>
+            </DialogFooter>
           </div>
-        </form>
-      </div>
-    </div>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }
