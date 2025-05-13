@@ -112,8 +112,31 @@ function onSubmit(values: z.infer<typeof formSchema>) {
   - shadcn UI の導入により、デザインシステムが統一され一貫性のある UI に
 
 - **フォームの状態管理とバリデーション**
+
   - 従来は useState を使った手動の状態管理とバリデーション
   - React Hook Form と zod の導入により、型安全かつ宣言的なフォーム実装が可能に
+
+- **モーダルを閉じた後もバリデーションエラーが残る問題**
+
+  - 問題: モーダルを閉じて再度開くと、前回のバリデーションエラーが表示されたままになる
+  - 解決策: モーダルのクローズハンドラでフォームをリセットする処理を追加
+
+  ```tsx
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // モーダルが閉じられたときの処理
+      form.reset();
+      form.clearErrors();
+      onClose();
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      {/* ... */}
+    </Dialog>
+  );
+  ```
 
 ## 学んだこと・メモ
 

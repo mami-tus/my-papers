@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import React from 'react';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Field name is required').max(100),
@@ -60,8 +61,18 @@ export function CreateFieldModal({ isOpen, onClose }: CreateFieldModalProps) {
     );
   }
 
+  // モーダルが閉じるときにフォームをリセットする
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // モーダルが閉じられたときの処理
+      form.reset();
+      form.clearErrors();
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add New Field</DialogTitle>
