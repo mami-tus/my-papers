@@ -118,6 +118,7 @@ const fieldsApp = new Hono<{
       );
     }
   })
+
   // GET /api/fields - ユーザーの分野一覧を取得
   .get('/', async (c) => {
     try {
