@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { client } from '../lib/api';
+import { client } from '@/lib/api';
 
 export function useCreateField() {
   const queryClient = useQueryClient();
