@@ -3,7 +3,6 @@ import { PlusCircle } from 'lucide-react';
 import { useFieldsList } from '../hooks/useFieldsList';
 import { CreateFieldModal } from '../components/CreateFieldModal';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Home() {
   const { fields, isLoading, error } = useFieldsList();
