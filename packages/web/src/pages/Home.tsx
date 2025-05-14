@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PlusCircle } from 'lucide-react';
 import { useFieldsList } from '../hooks/useFieldsList';
 import { CreateFieldModal } from '../components/CreateFieldModal';
@@ -7,6 +8,7 @@ import { Button } from '@/components/ui/button';
 export default function Home() {
   const { fields, isLoading, error } = useFieldsList();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   if (isLoading) return <div className="p-8">Loading...</div>;
   if (error) return <div className="p-8">Error occurred</div>;
@@ -29,7 +31,9 @@ export default function Home() {
               variant="secondary"
               className="w-full h-24 text-xl font-semibold"
               onClick={() =>
-                alert(`Field ID: ${field.id} will navigate to detail page`)
+                navigate(`/fields/${field.id}`, {
+                  state: { fieldName: field.name },
+                })
               }
             >
               {field.name}
