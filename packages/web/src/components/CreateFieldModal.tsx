@@ -20,7 +20,6 @@ import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import React from 'react';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Field name is required').max(100),
