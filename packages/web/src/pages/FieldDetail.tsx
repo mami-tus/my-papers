@@ -90,7 +90,7 @@ export default function FieldDetail() {
               <CardContent>
                 <div className="flex justify-between items-center mt-2">
                   <p className="text-sm text-muted-foreground">
-                    Added:{' '}
+                    Published:{' '}
                     {new Date(
                       paper.year || 0,
                       paper.month || 0,
