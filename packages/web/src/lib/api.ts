@@ -1,5 +1,3 @@
-import { client } from '../../../api/src/hc';
+import { hcWithType } from '../../../api/src/hc';
 
-export { client };
-
-// さらにカスタムフックも作成すると便利
+export const client = hcWithType(import.meta.env.VITE_API_URL);

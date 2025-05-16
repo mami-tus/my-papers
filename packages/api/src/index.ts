@@ -1,30 +1,30 @@
 import { Hono } from 'hono';
-import apiRouter from './routes';
+import routes from './routes';
 import { cors } from 'hono/cors';
 
-const app = new Hono();
+/**
+ * Honoアプリケーションの初期化
+ *
+ * ⚠️ 重要: メソッドチェーンの順序が処理の適用順序を決定します
+ * 1. use() - ミドルウェアを追加（CORSなど）
+ * 2. basePath() - APIのベースパスを設定
+ * 3. route() - ルートハンドラを設定
+ *
+ * この順序を変更すると、CORSヘッダーが適切に設定されないなどの問題が発生します。
+ */
 
-// CORSミドルウェアを追加
-app.use(
-  '/*',
-  cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174'], // フロントエンドのURL
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization'],
-    exposeHeaders: ['Content-Length'],
-    maxAge: 600,
-    credentials: true,
-  }),
-);
+const app = new Hono()
+  .use(
+    '/*',
+    cors({
+      origin: '*',
+    }),
+  )
+  .basePath('/api')
+  .route('', routes);
 
 app.get('/', (c) => {
   return c.text('Hello Hono!');
 });
-
-// APIルートをマウント
-const routes = app.route('/api', apiRouter);
-
-// アプリケーション全体の型をエクスポート
-export type AppType = typeof routes;
 
 export default app;

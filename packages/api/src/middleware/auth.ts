@@ -1,5 +1,5 @@
 import { createMiddleware } from 'hono/factory';
-import { verify } from 'hono/jwt';
+// import { verify } from 'hono/jwt';
 
 export type Variables = {
   userId: number;
@@ -27,6 +27,7 @@ export const authMiddleware = createMiddleware<{
 
     await next();
   } catch (error) {
+    console.error(error);
     return c.json({ error: '無効な認証トークンです' }, 401);
   }
 });

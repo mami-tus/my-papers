@@ -1,13 +1,13 @@
 import { Hono } from 'hono';
-import fieldsApp from './fields';
-import papersApp from './papers';
+import fields from './fields';
+import papers from './papers';
 import { authMiddleware } from '../middleware/auth';
 
 // メインルーターの作成
-const apiRouter = new Hono()
+const routes = new Hono()
   .use(authMiddleware)
   // 各ルートを追加
-  .route('/fields', fieldsApp)
-  .route('/papers', papersApp);
+  .route('/fields', fields)
+  .route('/papers', papers);
 
-export default apiRouter;
+export default routes;
