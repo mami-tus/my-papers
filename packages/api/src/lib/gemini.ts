@@ -202,7 +202,6 @@ ${paperDescriptions}
 export const createResearchSummaryPrompt = (
   papers: {
     title: string;
-    abstract?: string;
     authors?: string;
     year?: number;
   }[],
@@ -212,7 +211,6 @@ export const createResearchSummaryPrompt = (
       let desc = `タイトル: ${paper.title}`;
       if (paper.authors) desc += `\n著者: ${paper.authors}`;
       if (paper.year) desc += `\n年: ${paper.year}`;
-      if (paper.abstract) desc += `\n概要: ${paper.abstract}`;
       return desc;
     })
     .join('\n\n');
