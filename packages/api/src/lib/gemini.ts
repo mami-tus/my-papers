@@ -1,4 +1,3 @@
-import type { Context } from 'hono';
 import { getGeminiApiKey } from '../utils/env';
 
 // Gemini APIのエンドポイント
@@ -55,16 +54,20 @@ const RETRY_DELAY_MS = 1000;
 /**
  * Gemini APIにテキストプロンプトを送信して応答を取得する
  */
-export const generateTextWithGemini = async (
-  c: Context<{ Bindings: CloudflareBindings }>,
-  prompt: string,
-  options: {
+export const generateTextWithGemini = async ({
+  env,
+  prompt,
+  options = {},
+}: {
+  env: CloudflareBindings;
+  prompt: string;
+  options?: {
     temperature?: number;
     maxOutputTokens?: number;
     retries?: number;
-  } = {},
-): Promise<string> => {
-  const apiKey = getGeminiApiKey(c);
+  };
+}): Promise<string> => {
+  const apiKey = getGeminiApiKey({ env });
   const url = `${GEMINI_API_ENDPOINT}/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
   const request: GeminiRequest = {
@@ -143,14 +146,17 @@ export const generateTextWithGemini = async (
 /**
  * 論文関連のプロンプトを生成する補助関数
  */
-export const createRelatedPapersPrompt = (
+export const createRelatedPapersPrompt = ({
+  papers,
+  field,
+}: {
   papers: {
     title: string;
     authors?: string;
     year?: number;
-  }[],
-  field: string,
-): string => {
+  }[];
+  field: string;
+}): string => {
   const paperDescriptions = papers
     .map((paper) => {
       let desc = `タイトル: ${paper.title}`;
@@ -199,13 +205,15 @@ ${paperDescriptions}
 /**
  * 研究動向・課題の要約プロンプトを生成する補助関数
  */
-export const createResearchSummaryPrompt = (
+export const createResearchSummaryPrompt = ({
+  papers,
+}: {
   papers: {
     title: string;
     authors?: string;
     year?: number;
-  }[],
-): string => {
+  }[];
+}): string => {
   const paperDescriptions = papers
     .map((paper) => {
       let desc = `タイトル: ${paper.title}`;

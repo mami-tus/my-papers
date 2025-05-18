@@ -133,12 +133,19 @@ const fieldsApp = new Hono<{
         }));
 
         // プロンプトを生成
-        const prompt = createRelatedPapersPrompt(paperData, field.name);
+        const prompt = createRelatedPapersPrompt({
+          papers: paperData,
+          field: field.name,
+        });
 
         // Gemini APIでの生成
-        const response = await generateTextWithGemini(c, prompt, {
-          temperature: 0.7,
-          maxOutputTokens: 1500,
+        const response = await generateTextWithGemini({
+          env: c.env,
+          prompt,
+          options: {
+            temperature: 0.7,
+            maxOutputTokens: 1500,
+          },
         });
 
         // AIレスポンスからDOIを抽出
@@ -261,7 +268,7 @@ const fieldsApp = new Hono<{
   });
 
 // Geminiのレスポンスからすべてのドイを抽出
-function extractDoisFromGeminiResponse(text: string): string[] {
+const extractDoisFromGeminiResponse = (text: string): string[] => {
   const dois: string[] = [];
   const lines = text.split('\n');
 
@@ -278,6 +285,6 @@ function extractDoisFromGeminiResponse(text: string): string[] {
 
   // 重複を除去
   return [...new Set(dois)];
-}
+};
 
 export default fieldsApp;
