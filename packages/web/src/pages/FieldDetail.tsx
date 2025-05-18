@@ -5,6 +5,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { PlusCircle, ArrowLeft, ExternalLink } from 'lucide-react';
 import { usePapersByField } from '@/hooks/usePapersByField';
 import { CreatePaperModal } from '@/components/CreatePaperModal';
+import { SuggestPapersButton } from '@/components/SuggestPapersButton';
+import { Toaster } from '@/components/ui/sonner';
 
 export default function FieldDetail() {
   // Get route parameters and state
@@ -66,10 +68,16 @@ export default function FieldDetail() {
           </Button>
           <h1 className="text-3xl font-bold">{fieldName}</h1>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add Paper
-        </Button>
+        <div className="flex gap-2">
+          <SuggestPapersButton
+            fieldId={Number(fieldId)}
+            fieldName={fieldName || 'Field'}
+          />
+          <Button onClick={() => setIsCreateModalOpen(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Paper
+          </Button>
+        </div>
       </div>
 
       {/* Papers list */}
@@ -128,6 +136,9 @@ export default function FieldDetail() {
         onClose={() => setIsCreateModalOpen(false)}
         fieldId={fieldId || ''}
       />
+
+      {/* Toast notifications */}
+      <Toaster position="bottom-right" />
     </div>
   );
 }

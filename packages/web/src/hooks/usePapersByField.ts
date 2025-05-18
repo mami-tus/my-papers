@@ -9,11 +9,9 @@ export function usePapersByField(fieldId?: string) {
         throw new Error('Field ID is required');
       }
 
-      console.log('Requesting URL for fieldId:', fieldId);
       const res = await client.api.fields[':id'].papers.$get({
         param: { id: fieldId },
       });
-      console.log('Response status:', res.status);
 
       if (!res.ok) {
         throw new Error('Failed to fetch papers');

@@ -169,10 +169,11 @@ const fieldsApp = new Hono<{
               return null;
             } catch (error) {
               console.error(`DOI ${doi} のメタデータ取得に失敗:`, error);
-              return { doi, title: '情報取得エラー', authors: [] };
             }
           }),
-        ).then((papers) => papers.filter((paper) => paper !== null));
+        ).then((papers) =>
+          papers.filter((paper) => paper !== null && paper !== undefined),
+        );
 
         return c.json({
           success: true,
