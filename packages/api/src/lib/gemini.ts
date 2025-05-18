@@ -135,3 +135,95 @@ export const generateTextWithGemini = async (
       }
     }
   }
+
+  // すべてのリトライが失敗した場合
+  throw lastError || new Error('Failed to get response from Gemini API');
+};
+
+/**
+ * 論文関連のプロンプトを生成する補助関数
+ */
+export const createRelatedPapersPrompt = (
+  papers: {
+    title: string;
+    authors?: string;
+    year?: number;
+  }[],
+  field: string,
+): string => {
+  const paperDescriptions = papers
+    .map((paper) => {
+      let desc = `タイトル: ${paper.title}`;
+      if (paper.authors) desc += `\n著者: ${paper.authors}`;
+      if (paper.year) desc += `\n年: ${paper.year}`;
+      return desc;
+    })
+    .join('\n\n');
+
+  // 分野情報がある場合はプロンプトに含める
+  const fieldInfo = `研究分野: ${field}`;
+
+  return `以下の論文に関連する論文を5つ提案してください。可能な限り5つの実在する論文のDOIを返してください。
+
+重要条件:
+1. 必ず5つの実在するDOIを返すよう最善を尽くしてください。
+2. 返すDOIは全て https://doi.org/[DOI] でアクセスできるものでなければなりません。
+3. 関連度が最も高いものから順に並べてください。
+4. 過去に出版された重要な論文を選び、特に引用数が多い論文や有名な論文を優先してください。
+5. 元の論文の研究分野と確実に関連性がある論文を選んでください。
+6. もし確実な実在するDOIが5つ見つからない場合でも、できるだけ多くの確実なDOIを返してください。
+
+出力手順:
+1. あなたの知識の中で、上記論文群と関連が高い5つの論文を特定してください。
+2. それぞれの論文のDOIを特定します。
+3. 各DOIが https://doi.org/[DOI] で実際にアクセス可能か確認してください。
+4. 確実に存在するDOIのみを以下の形式でリストアップしてください。
+5. 必ず5つのDOIを返すよう努めてください。
+
+出力形式:
+DOI: 10.xxxx/xxxx
+DOI: 10.xxxx/xxxx
+DOI: 10.xxxx/xxxx
+DOI: 10.xxxx/xxxx
+DOI: 10.xxxx/xxxx
+
+上記の形式で、確実に実在するDOIを5つ記載してください。特に以下のジャーナルや出版社の論文を優先すると良いでしょう: Nature, Science, PLOS, IEEE, ACM, Elsevier, Springer, Wiley。
+
+元の論文:
+${fieldInfo}
+${paperDescriptions}
+
+5つの確実に実在する関連論文のDOI:`;
+};
+
+/**
+ * 研究動向・課題の要約プロンプトを生成する補助関数
+ */
+export const createResearchSummaryPrompt = (
+  papers: {
+    title: string;
+    abstract?: string;
+    authors?: string;
+    year?: number;
+  }[],
+): string => {
+  const paperDescriptions = papers
+    .map((paper) => {
+      let desc = `タイトル: ${paper.title}`;
+      if (paper.authors) desc += `\n著者: ${paper.authors}`;
+      if (paper.year) desc += `\n年: ${paper.year}`;
+      if (paper.abstract) desc += `\n概要: ${paper.abstract}`;
+      return desc;
+    })
+    .join('\n\n');
+
+  return `以下の論文情報に基づいて、この研究分野のこれまでの流れと現在の課題について要約してください。
+要約は以下の構造に従ってください:
+1. 研究分野の概要（1段落）
+2. 主要な研究の流れと発展（複数段落）
+3. 現在の主要な課題（箇条書き）
+4. 将来の研究方向性（1段落）
+
+論文情報:
+${paperDescriptions}`;
+};
