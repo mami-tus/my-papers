@@ -18,7 +18,7 @@ import {
   CardFooter,
 } from './ui/card';
 import { useCreatePaper } from '@/hooks/useCreatePaper';
-import { toast } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface SuggestPapersButtonProps {
   fieldId: number;
@@ -46,16 +46,13 @@ export function SuggestPapersButton({
       {
         onSuccess: () => {
           setRegisteredDois((prev) => [...prev, doi]);
-          toast({
-            title: 'Paper registered',
+          toast('Paper registered', {
             description: 'The paper has been added to your collection',
           });
         },
         onError: (error) => {
-          toast({
-            title: 'Registration failed',
+          toast('Registration failed', {
             description: error.message,
-            variant: 'destructive',
           });
         },
       },
