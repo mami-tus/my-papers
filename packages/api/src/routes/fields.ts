@@ -6,6 +6,11 @@ import { z } from 'zod';
 import { eq, and } from 'drizzle-orm';
 import { createDbClient } from '../db/drizzle';
 import type { Variables } from '../middleware/auth';
+import {
+  createRelatedPapersPrompt,
+  generateTextWithGemini,
+} from '../lib/gemini';
+import { fetchPaperMetadata } from '../lib/crossref';
 
 // DBスキーマとZodスキーマの連携
 const insertFieldSchema = createInsertSchema(fields, {
@@ -74,6 +79,113 @@ const fieldsApp = new Hono<{
       );
     }
   })
+
+  // POST /api/fields/:id/papers/suggest - 特定分野の関連論文の提案
+  .post(
+    '/:id/papers/suggest',
+    zValidator('param', fieldIdSchema),
+    async (c) => {
+      try {
+        const { id: fieldId } = c.req.valid('param');
+        const userId = c.get('userId');
+
+        // DBインスタンスの取得
+        const db = createDbClient(c.env.DB);
+
+        // まず分野が存在するか確認
+        const field = await db
+          .select()
+          .from(fields)
+          .where(eq(fields.id, fieldId))
+          .get();
+
+        if (!field) {
+          return c.json(
+            { success: false, error: '指定された分野が見つかりません' },
+            404,
+          );
+        }
+
+        // 特定分野の論文一覧を取得
+        const fieldPapers = await db
+          .select()
+          .from(papers)
+          .where(and(eq(papers.userId, userId), eq(papers.fieldId, fieldId)))
+          .all();
+
+        if (fieldPapers.length === 0) {
+          return c.json(
+            {
+              success: false,
+              error: 'この分野にはまだ論文が登録されていません',
+            },
+            400,
+          );
+        }
+
+        // Gemini APIへのプロンプト用に論文データを整形
+        const paperData = fieldPapers.map((paper) => ({
+          title: paper.title,
+          authors: Array.isArray(paper.authors)
+            ? paper.authors.join(', ')
+            : undefined,
+          year: paper.year || undefined,
+        }));
+
+        // プロンプトを生成
+        const prompt = createRelatedPapersPrompt(paperData, field.name);
+
+        // Gemini APIでの生成
+        const response = await generateTextWithGemini(c, prompt, {
+          temperature: 0.7,
+          maxOutputTokens: 1500,
+        });
+
+        // AIレスポンスからDOIを抽出
+        const extractedDois = extractDoisFromGeminiResponse(response);
+
+        // 抽出したDOIからメタデータを取得
+        const suggestedPapers = await Promise.all(
+          extractedDois.map(async (doi) => {
+            try {
+              const metadata = await fetchPaperMetadata(doi);
+              if (metadata !== null) {
+                return {
+                  doi,
+                  title: metadata.title,
+                  authors: metadata.authors || [],
+                  year: metadata.year,
+                  month: metadata.month,
+                  day: metadata.day,
+                };
+              }
+              return null;
+            } catch (error) {
+              console.error(`DOI ${doi} のメタデータ取得に失敗:`, error);
+              return { doi, title: '情報取得エラー', authors: [] };
+            }
+          }),
+        ).then((papers) => papers.filter((paper) => paper !== null));
+
+        return c.json({
+          success: true,
+          fieldName: field.name,
+          paperCount: fieldPapers.length,
+          suggestions: response,
+          suggestedPapers,
+        });
+      } catch (error) {
+        console.error('論文提案エラー:', error);
+        return c.json(
+          {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          },
+          500,
+        );
+      }
+    },
+  )
 
   // GET /api/fields/:id/papers - 特定分野の論文一覧を取得
   // 現状問題ないがより具体的なパスを先に定義する
@@ -147,5 +259,25 @@ const fieldsApp = new Hono<{
       );
     }
   });
+
+// Geminiのレスポンスからすべてのドイを抽出
+function extractDoisFromGeminiResponse(text: string): string[] {
+  const dois: string[] = [];
+  const lines = text.split('\n');
+
+  // 「DOI: 」で始まる行からDOIを抽出
+  for (const line of lines) {
+    if (line.trim().startsWith('DOI:')) {
+      const doiPart = line.trim().substring(4).trim();
+      // 基本的なDOI形式の検証 (10.xxxx/xxxx)
+      if (doiPart.match(/^10\.\d{4,}\/[^\s,;:\\"'<>()[\]{}]+$/)) {
+        dois.push(doiPart);
+      }
+    }
+  }
+
+  // 重複を除去
+  return [...new Set(dois)];
+}
 
 export default fieldsApp;
