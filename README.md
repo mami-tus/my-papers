@@ -19,6 +19,7 @@
 - **パッケージマネージャー:** pnpm
 - **フロントエンド:** React, Vite, Tailwind CSS
 - **バックエンド:** Hono (on Cloudflare Workers)
+- **外部 API 連携:** CrossRef API (論文情報取得)
 - **データベース:** Cloudflare D1
 - **ORM:** Drizzle ORM
 - **コード品質:** Biome

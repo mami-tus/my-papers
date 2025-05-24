@@ -102,7 +102,7 @@ export function SuggestPapersButton({
         )}
 
         {data && !isPending && suggestedPapers.length > 0 && (
-          <div className="grid gap-4 mt-4 pr-4">
+          <div className="grid gap-4 mt-4 px-4">
             {suggestedPapers.map((paper) => (
               <Card key={paper.doi} className="hover:shadow-md transition">
                 <CardHeader>

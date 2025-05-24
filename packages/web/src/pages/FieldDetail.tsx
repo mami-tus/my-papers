@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { PlusCircle, ArrowLeft, ExternalLink } from 'lucide-react';
+import { PlusCircle, ArrowLeft } from 'lucide-react';
 import { usePapersByField } from '@/hooks/usePapersByField';
 import { CreatePaperModal } from '@/components/CreatePaperModal';
 import { SuggestPapersButton } from '@/components/SuggestPapersButton';
 import { Toaster } from '@/components/ui/sonner';
+import { PaperRelationshipFlow } from '@/components/PaperRelationshipFlow';
 
 export default function FieldDetail() {
   // Get route parameters and state
@@ -81,7 +81,7 @@ export default function FieldDetail() {
       </div>
 
       {/* Papers list */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {papers && papers.length > 0 ? (
           papers.map((paper) => (
             <Card key={paper.id} className="hover:shadow-md transition">
@@ -123,6 +123,19 @@ export default function FieldDetail() {
           ))
         ) : (
           <div className="col-span-2 text-center py-12 bg-muted/40 rounded-lg">
+            <p className="text-muted-foreground">
+              No papers yet. Use the "Add Paper" button to register one.
+            </p>
+          </div>
+        )}
+      </div> */}
+
+      {/* Papers list */}
+      <div className="w-full h-full">
+        {papers && papers.length > 0 ? (
+          <PaperRelationshipFlow papers={papers} />
+        ) : (
+          <div className="text-center py-12 bg-muted/40 rounded-lg">
             <p className="text-muted-foreground">
               No papers yet. Use the "Add Paper" button to register one.
             </p>
