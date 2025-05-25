@@ -14,13 +14,14 @@
 
 ## 技術スタック
 
+- **生成 AI:** Gemini API（2.0 Flash）
+- **開発支援 AI:** Cursor, Gemini, ChatGPT, V0, Stitch
 - **言語:** TypeScript
 - **ランタイム:** Node.js
 - **パッケージマネージャー:** pnpm
-- **フロントエンド:** React, Vite, Tailwind CSS
-- **バックエンド:** Hono (on Cloudflare Workers)
-- **外部 API 連携:** CrossRef API (論文情報取得)
+- **フロントエンド:** React, Vite, shadcn/ui, Tailwind CSS, React Flow
+- **バックエンド:** Hono (on Cloudflare Workers), CrossRef API
 - **データベース:** Cloudflare D1
 - **ORM:** Drizzle ORM
-- **コード品質:** Biome
+- **リンター/フォーマッター:** Biome
 - **デプロイ/ホスティング:** Cloudflare Pages, Cloudflare Workers
